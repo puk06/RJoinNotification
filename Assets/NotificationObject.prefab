@@ -456,8 +456,7 @@ MonoBehaviour:
   transitionInTime: 0.4
   transitionOutTime: 0.4
   stayTime: 1
-  allowTextAnimation: 1
-  intervalPerChar: 0.1
+  popModeOffset: 120
   background: {fileID: 4568135123074455526}
   statusBubble: {fileID: 8258067470798106875}
   joinTextTMP: {fileID: 6018560138181725197}

@@ -76,16 +76,6 @@ namespace com.rurinya.joinnotification
                 if (!notification[0].activeSelf) return notification[0];
                 else return notification[1];
             }
-            // for(int i = 0; i < maxNotificationIndex; i++)
-            // {
-            //     if (notification[i].GetComponent<RJoinNotificationObject>().isActive){
-            //         continue;
-            //     }
-            //     else
-            //     {
-            //         return notification[i];
-            //     }
-            // }
             if(notificationIndex >= notification.Length) notificationIndex = 1;
             return notification[notificationIndex++];
             
@@ -103,21 +93,18 @@ namespace com.rurinya.joinnotification
         //     notificationIndex = 0;
         // }
         public override void OnPlayerJoined(VRCPlayerApi player){
-            // GameObject instantiated = Instantiate(notification,gameObject.transform);
-            // notification.GetComponent<RJoinNotificationObject>().SetInfo(true, player.displayName);
             if(!gameObject.GetComponent<AudioSource>().isPlaying && !isMuted){
                 gameObject.GetComponent<AudioSource>().clip = joinSound;
                 gameObject.GetComponent<AudioSource>().Play();
             }
             GameObject notificationObject = NotificationManager();
             notificationObject.SetActive(true);
+            notificationObject.transform.SetAsLastSibling();
             notificationObject.GetComponent<RJoinNotificationObject>().SetInfo(true, player.displayName, hasBackground, (int)animationMode);
 
             
         }
         public override void OnPlayerLeft(VRCPlayerApi player){
-            // GameObject instantiated = Instantiate(notification);
-            // notification.GetComponent<RJoinNotificationObject>().SetInfo(false, player.displayName);
 
             if(!gameObject.GetComponent<AudioSource>().isPlaying && !isMuted){
                 gameObject.GetComponent<AudioSource>().clip = exitSound;
@@ -125,6 +112,7 @@ namespace com.rurinya.joinnotification
             }
             GameObject notificationObject = NotificationManager();
             notificationObject.SetActive(true);
+            notificationObject.transform.SetAsLastSibling();
             notificationObject.GetComponent<RJoinNotificationObject>().SetInfo(false, player.displayName, hasBackground, (int)animationMode);
             
         }

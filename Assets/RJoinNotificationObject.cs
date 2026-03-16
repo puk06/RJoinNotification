@@ -25,23 +25,17 @@ namespace com.rurinya.joinnotification
         [SerializeField] private float transitionInTime = 0.4f;
         [SerializeField] private float transitionOutTime = 0.4f;
         [SerializeField] private float stayTime = 1f;
-        [SerializeField] private bool allowTextAnimation = true;
-        [SerializeField] private float intervalPerChar = 0.1f;
+        // [SerializeField] private bool allowTextAnimation = true;
+        // [SerializeField] private float intervalPerChar = 0.1f;
+        [SerializeField] private int popModeOffset = 120;
         [Space(10)]
         [SerializeField] private Image background;
         [SerializeField] private Image statusBubble;
-        // [SerializeField] private TMP_Text joinTextTMP;
-        // [SerializeField] private TMP_Text exitTextTMP;
-        // [SerializeField] private TMP_Text usernameTMP;
 
         [SerializeField] private Text joinTextTMP;
         [SerializeField] private Text exitTextTMP;
         [SerializeField] private Text usernameTMP;
         
-        // [SerializeField] private float backgroundDefaultLength;
-        // [SerializeField] private float statusBubbleDefaultLength;
-        // [SerializeField] private float usernameDefaultLength;
-        // [SerializeField] private float paddingLength;
         [SerializeField] private Color joinInfoColor;
         [SerializeField] private Color exitInfoColor;
         [SerializeField] private CanvasAnimationSystem canvasAnimationSystem;
@@ -49,6 +43,14 @@ namespace com.rurinya.joinnotification
         private Component[] animatedComponents;
         private Vector3 defaultScale;
         private Vector3 targetScale;
+
+        // Default position
+        private int defaultUsernamePosition;
+        private int defaultBGPosition;
+        private int defaultStatusPosition;
+
+        private bool firstAction = true;
+
 
         // Text Animation
 
@@ -76,25 +78,10 @@ namespace com.rurinya.joinnotification
             }
             usernameTMP.text = username;
             AnimationController(mode);
-            //float targetBackgroundLength = statusBubbleDefaultLength + usernameText.text.Length*10 + paddingLength;
-            //Debug.Log(targetBackgroundLength);
-            //background.GetComponent<RectTransform>().sizeDelta = new Vector2(targetBackgroundLength, stayTime00);
-            //background.transform.position = new Vector3((targetBackgroundLength - backgroundDefaultLength)/2,background.transform.position.y,background.transform.position.z);
-            //bubble.GetComponent<RectTransform>().sizeDelta = new Vector2(usernameDefaultLength + usernameText.text.Length, 90);
-            //bubble.GetComponent<RectTransform>().sizeDelta = new Vector2(usernameDefaultLength + bubble.gameObject.GetComponent<RectTransform>().sizeDelta.x * 0.5f, stayTime00);
-
-            //gameObject.GetComponent<Animator>().SetBool("isActive", true);
         }
         void Start()
         {
-            defaultScale = background.transform.localScale;
-            canvasAnimationSystem
-                .DefineTransform(animatedComponents, new Vector3(1,1,1), TransformType.Scale)
-                .SaveTransform(animatedComponents, new TransformType[]{TransformType.Position});
-                // .Hide(background)
-                // .Hide(statusBubble)
-                // .Hide(statusText)
-                // .Hide(usernameText);
+            
         }
         // void Update()
         // {
@@ -113,14 +100,34 @@ namespace com.rurinya.joinnotification
         private void Starter(int mode)
         {
             
-            if (background!= null && statusBubble != null && joinTextTMP != null && exitTextTMP != null && usernameTMP != null)
-            animatedComponents = new Component[] {background, statusBubble, joinTextTMP, exitTextTMP,  usernameTMP};
-            else
+            if (firstAction)
             {
-                Debug.LogError("RJoinNotification: アニメーションで使用されるコンポーネントが初期化されていません。");
-                gameObject.SetActive(false);
-                return;
+                if (background!= null && statusBubble != null && joinTextTMP != null && exitTextTMP != null && usernameTMP != null)
+                    animatedComponents = new Component[] {background, statusBubble, joinTextTMP, exitTextTMP,  usernameTMP};
+                else
+                {
+                    Debug.LogError("RJoinNotification: アニメーションで使用されるコンポーネントが初期化されていません。");
+                    gameObject.SetActive(false);
+                    return;
+                }
+                
+                defaultUsernamePosition = (int)usernameTMP.gameObject.GetComponent<RectTransform>().anchoredPosition.x - popModeOffset;
+                defaultBGPosition = (int)background.gameObject.GetComponent<RectTransform>().anchoredPosition.x - popModeOffset;
+                defaultStatusPosition = Math.Abs((int)statusBubble.gameObject.GetComponent<RectTransform>().anchoredPosition.x) + popModeOffset;
+
+                
+                defaultScale = background.transform.localScale;
+                canvasAnimationSystem
+                    .DefineTransform(animatedComponents, new Vector3(1,1,1), TransformType.Scale)
+                    .SaveTransform(animatedComponents, new TransformType[]{TransformType.Position})
+                    .Hide(background)
+                    .Hide(statusBubble)
+                    .Hide(joinTextTMP)
+                    .Hide(exitTextTMP)
+                    .Hide(usernameTMP);
+                firstAction = false;
             }
+            
             if (mode != 1)
             canvasAnimationSystem
                 .Cancel(animatedComponents)
@@ -191,10 +198,20 @@ namespace com.rurinya.joinnotification
             canvasAnimationSystem
                 // .Cancel(animatedComponents)
                 .ResetTransform(animatedComponents, new TransformType[] {TransformType.Scale})
-                .Scale(animatedComponents, transitionInTime, 0, AnimationDirection.From, new Vector3(0,0,0), TransitionType.Linear)
+                .Scale(animatedComponents, transitionInTime, 0, AnimationDirection.From, new Vector3(0,0,0), TransitionType.EaseInOut)
+                .Move(background, transitionInTime, 0, defaultBGPosition, MoveDirection.Right, TransitionType.EaseInOut)
+                .Move(usernameTMP, transitionInTime, 0, defaultUsernamePosition, MoveDirection.Right, TransitionType.EaseInOut)
+                .Move(statusBubble, transitionInTime, 0, defaultStatusPosition, MoveDirection.Left, TransitionType.EaseInOut)
+                .Move(joinTextTMP, transitionInTime, 0, defaultStatusPosition, MoveDirection.Left, TransitionType.EaseInOut)
+                .Move(exitTextTMP, transitionInTime, 0, defaultStatusPosition, MoveDirection.Left, TransitionType.EaseInOut)
                 //.Scale(animatedComponents, transitionInTime*0.2f, transitionInTime, AnimationDirection.To, targetScale, TransitionType.Linear)
                 //.Scale(animatedComponents, 0.1f, 0, AnimationDirection.From, targetScale, TransitionType.EaseInOut)
-                .Scale(animatedComponents, transitionOutTime, stayTime+transitionInTime, AnimationDirection.To, new Vector3(0,0,0), TransitionType.EaseInOut);
+                .Scale(animatedComponents, transitionOutTime, stayTime+transitionInTime, AnimationDirection.To, new Vector3(0,0,0), TransitionType.EaseInOut)
+                .MoveTo(background, transitionOutTime, stayTime+transitionInTime, defaultBGPosition, MoveDirection.Left, TransitionType.EaseInOut)
+                .MoveTo(usernameTMP, transitionOutTime, stayTime+transitionInTime, defaultUsernamePosition, MoveDirection.Left, TransitionType.EaseInOut)
+                .MoveTo(statusBubble, transitionOutTime, stayTime+transitionInTime, defaultStatusPosition, MoveDirection.Right, TransitionType.EaseInOut)
+                .MoveTo(joinTextTMP, transitionOutTime, stayTime+transitionInTime, defaultStatusPosition, MoveDirection.Right, TransitionType.EaseInOut)
+                .MoveTo(exitTextTMP, transitionOutTime, stayTime+transitionInTime, defaultStatusPosition, MoveDirection.Right, TransitionType.EaseInOut);
         }
         private void AnimFadeInLeft()
         {
