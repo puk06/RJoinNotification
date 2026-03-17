@@ -414,7 +414,7 @@ RectTransform:
   m_GameObject: {fileID: 8745261643967452784}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6383842384079176305}
@@ -457,13 +457,13 @@ MonoBehaviour:
   transitionOutTime: 0.4
   stayTime: 1
   popModeOffset: 120
+  joinInfoColor: {r: 0.5695626, g: 1, b: 0.514151, a: 0}
+  exitInfoColor: {r: 1, g: 0.3537736, b: 0.3537736, a: 0}
   background: {fileID: 4568135123074455526}
   statusBubble: {fileID: 8258067470798106875}
   joinTextTMP: {fileID: 6018560138181725197}
   exitTextTMP: {fileID: 1030623592140357696}
   usernameTMP: {fileID: 7859915591978859929}
-  joinInfoColor: {r: 0.5695626, g: 1, b: 0.514151, a: 0}
-  exitInfoColor: {r: 1, g: 0.3537736, b: 0.3537736, a: 0}
   canvasAnimationSystem: {fileID: 0}
 --- !u!114 &7078300591508023818
 MonoBehaviour:

@@ -10,18 +10,18 @@ namespace com.rurinya.joinnotification
     public class RStateReporter : UdonSharpBehaviour
     {
         [SerializeField] private UdonBehaviour targetBehavior;
-        [SerializeField] private string eventName;
+        [SerializeField] private string targetEventName;
         void Start()
         {
             
         }
         void OnEnable()
         {
-            targetBehavior.SendCustomEvent(eventName);
+            targetBehavior.SendCustomEvent(targetEventName);
         }
         void OnDisable()
         {
-            targetBehavior.SendCustomEvent(eventName);
+            targetBehavior.SendCustomEvent(targetEventName);
         }
     }
 }

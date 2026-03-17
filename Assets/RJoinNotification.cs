@@ -125,6 +125,7 @@ namespace com.rurinya.joinnotification
         public void SetMuted()
         {
             isMuted = !isMuted;
+            Debug.Log("RJoinNotification: Mute Mode: " + isMuted);
         }
 
     }

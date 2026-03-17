@@ -38,7 +38,9 @@ VRChatワールド用の入退室通知システムです。
 
 ### Canvas Aninmation System (Max Concurrent Animations)
 
-同時実行できるアニメーションの数です。（おすすめ: 96）
+同時実行できるアニメーションの数です。
+
+Pop以外のおすすめ: 64 Popのおすすめ: 128
 
 ほかの設定は確認用のため、変更してもなにも効果がありません。
 
@@ -66,5 +68,10 @@ Pop Modeを利用する場合で、右へのオフセットです。デフォル
 
 入室・退室のときに通知の色です。
 
+### isMuted オブジェクト
+
+RJoinNotificationの下にあるisMutedオブジェクトは、入退室通知の音が流れるかどうかを制御するオブジェクトです。このオブジェクトは外部のスイッチなどによる操作が可能です。
+
+例えば、Lura's SwitchのTargetObjectに入れると、Lura's Switchでの制御が可能です。
 
 > WIP
