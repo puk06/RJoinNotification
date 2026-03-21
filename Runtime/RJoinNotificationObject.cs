@@ -3,7 +3,6 @@ using System;
 using net.puk06.CanvasAnimation;
 using net.puk06.CanvasAnimation.Models;
 using net.puk06.CanvasAnimation.Utils;
-using TMPro;
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;

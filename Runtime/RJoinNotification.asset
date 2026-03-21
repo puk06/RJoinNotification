@@ -122,7 +122,7 @@ MonoBehaviour:
       Data: 7|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: com.rurinya.joinnotification.AnimMode, Assembly-CSharp
+      Data: com.rurinya.joinnotification.AnimMode, com.rurinya.joinnotification
     - Name: 
       Entry: 8
       Data: 
