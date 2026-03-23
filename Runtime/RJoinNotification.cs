@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -17,12 +18,38 @@ namespace com.rurinya.joinnotification
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class RJoinNotification : UdonSharpBehaviour
     {
+        [Header("入退室通知の内容")]
+        [Header("スペースが文字数で変わらないため、文字数が多くなると表示がおかしくなる場合があります。")]
+        [SerializeField] private string joinText = "Join";
+        [SerializeField] private string exitText = "Exit";
+        [Header("入退室通知の色")]
+        [Header("Alphaを0のままにしてください。")]
+        [Header("実際に表示されるAlpha値は1になります。")]
+        [SerializeField] private Color joinInfoColor;
+        [SerializeField] private Color exitInfoColor;
+        [Header("アニメーションの長さ")]
+        [SerializeField] private float transitionInTime = 0.4f;
+        [SerializeField] private float transitionOutTime = 0.4f;
+        [SerializeField] private float stayTime = 1f;
+
+        [Header("バックグラウンド有効")]
         [SerializeField] private bool hasBackground = true;
+        [Header("オーディオだけにする")]
+        [SerializeField] private bool audioOnly;
+        [Header("アニメーションのモード")]
         [SerializeField] private AnimMode animationMode = AnimMode.FadeIn;
+        [Header("Popモードで右へのオフセット")]
+        [SerializeField] private int popModeOffset = 120;
+        [Header("複数のアニメーションが同時に動作できるようにする")]
         [SerializeField] private bool allowMultipleNotifications = true;
-        [SerializeField] private GameObject[] notification;
+
+        [Header("入、退室音")]
         [SerializeField] private AudioClip joinSound;
         [SerializeField] private AudioClip exitSound;
+
+        [Header("通知オブジェクト。通常では編集する必要がありません。")]
+        [SerializeField] private GameObject[] notification;
+        
         private bool isMuted = false;
 
 
@@ -94,28 +121,28 @@ namespace com.rurinya.joinnotification
         //     notificationIndex = 0;
         // }
         public override void OnPlayerJoined(VRCPlayerApi player){
-            if(!gameObject.GetComponent<AudioSource>().isPlaying && !isMuted){
-                gameObject.GetComponent<AudioSource>().clip = joinSound;
-                gameObject.GetComponent<AudioSource>().Play();
-            }
-            GameObject notificationObject = NotificationManager();
-            notificationObject.SetActive(true);
-            notificationObject.transform.SetAsLastSibling();
-            notificationObject.GetComponent<RJoinNotificationObject>().SetInfo(true, player.displayName, hasBackground, (int)animationMode);
-
+            SendNotification(true, player.displayName);
             
         }
         public override void OnPlayerLeft(VRCPlayerApi player){
-
+            SendNotification(false, player.displayName);
+        }
+        private void SendNotification(bool state, string username)
+        {
             if(!gameObject.GetComponent<AudioSource>().isPlaying && !isMuted){
-                gameObject.GetComponent<AudioSource>().clip = exitSound;
+                gameObject.GetComponent<AudioSource>().clip = state ? joinSound : exitSound;
                 gameObject.GetComponent<AudioSource>().Play();
             }
             GameObject notificationObject = NotificationManager();
-            notificationObject.SetActive(true);
-            notificationObject.transform.SetAsLastSibling();
-            notificationObject.GetComponent<RJoinNotificationObject>().SetInfo(false, player.displayName, hasBackground, (int)animationMode);
-            
+            if (!audioOnly)
+            {
+                if(!notificationObject.activeSelf){
+                    notificationObject.SetActive(true);
+                    notificationObject.GetComponent<RJoinNotificationObject>().Setup(joinText, exitText, popModeOffset, transitionInTime, transitionOutTime, stayTime, joinInfoColor, exitInfoColor);
+                }
+                notificationObject.transform.SetAsLastSibling();
+                notificationObject.GetComponent<RJoinNotificationObject>().StartAnimation(state, username, hasBackground, (int)animationMode);
+            }
         }
 
         public void SetMuted(bool state){
@@ -126,6 +153,14 @@ namespace com.rurinya.joinnotification
         {
             isMuted = !isMuted;
             Debug.Log("RJoinNotification: Mute Mode: " + isMuted);
+        }
+        public void Test(bool state)
+        {
+            SendNotification(state, "テスト / Test Username " + UnityEngine.Random.Range(0,1000));
+        }
+        public void Test()
+        {
+            Test(UnityEngine.Random.Range(0,2) == 1);
         }
 
     }

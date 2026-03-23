@@ -14,24 +14,16 @@ namespace com.rurinya.joinnotification
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class RJoinNotificationObject : UdonSharpBehaviour
     {
-        
-
-        [Header("スペースが文字数で変わらないため、文字数が多くなると表示がおかしくなる場合があります。")]
-        [SerializeField] private string joinText = "Join";
-        [SerializeField] private string exitText = "Exit";
-        [Space(20)]
-        [Header("アニメーションの長さなど")]
-        [SerializeField] private float transitionInTime = 0.4f;
-        [SerializeField] private float transitionOutTime = 0.4f;
-        [SerializeField] private float stayTime = 1f;
+        private string joinText = "Join";
+        private string exitText = "Exit";
+        private float transitionInTime = 0.4f;
+        private float transitionOutTime = 0.4f;
+        private float stayTime = 1f;
         // [SerializeField] private bool allowTextAnimation = true;
         // [SerializeField] private float intervalPerChar = 0.1f;
-        [SerializeField] private int popModeOffset = 120;
-        [Header("Alphaを0のままにしてください。")]
-        [Header("実際に表示されるAlpha値は1になります。")]
-        [SerializeField] private Color joinInfoColor;
-        [SerializeField] private Color exitInfoColor;
-        [Space(20)]
+        private int popModeOffset = 120;
+        private Color joinInfoColor;
+        private Color exitInfoColor;
         [Header("オブジェクトレファレンス")]
         [SerializeField] private Image background;
         [SerializeField] private Image statusBubble;
@@ -53,28 +45,60 @@ namespace com.rurinya.joinnotification
         private int defaultBGPosition;
         private int defaultStatusPosition;
 
-        private bool firstAction = true;
-
 
         // Text Animation
 
         // private float timeStamp;
         // private string tempUsername;
         // private int animIndex;
-
-        public void SetInfo(bool status, string username, bool hasBackground, int mode)
+        public void Setup(string join, string exit, int offset, float transitionIn, float transitionOut, float transitionStay, Color joinColor, Color exitColor)
         {
-            //tempUsername = username;
+            joinText = join;
+            exitText = exit;
+            popModeOffset = offset;
+            transitionInTime = transitionIn;
+            transitionOutTime = transitionOut;
+            stayTime = transitionStay;
+            joinInfoColor = joinColor;
+            exitInfoColor = exitColor;
+
+            if (background!= null && statusBubble != null && joinTextTMP != null && exitTextTMP != null && usernameTMP != null)
+                animatedComponents = new Component[] {background, statusBubble, joinTextTMP, exitTextTMP,  usernameTMP};
+            else
+            {
+                Debug.LogError("RJoinNotification: アニメーションで使用されるコンポーネントが初期化されていません。");
+                gameObject.SetActive(false);
+                return;
+            }
+            
+            defaultUsernamePosition = (int)usernameTMP.gameObject.GetComponent<RectTransform>().anchoredPosition.x - popModeOffset;
+            defaultBGPosition = (int)background.gameObject.GetComponent<RectTransform>().anchoredPosition.x - popModeOffset;
+            defaultStatusPosition = Math.Abs((int)statusBubble.gameObject.GetComponent<RectTransform>().anchoredPosition.x) + popModeOffset;
+
+            
+            defaultScale = background.transform.localScale;
+            canvasAnimationSystem
+                .DefineTransform(animatedComponents, new Vector3(1,1,1), TransformType.Scale)
+                .SaveTransform(animatedComponents, new TransformType[]{TransformType.Position})
+                .Hide(background)
+                .Hide(statusBubble)
+                .Hide(joinTextTMP)
+                .Hide(exitTextTMP)
+                .Hide(usernameTMP);
+        }
+
+        public void StartAnimation(bool status, string username, bool hasBackground, int mode)
+        {
             background.gameObject.SetActive(hasBackground);
             if (status == true){
-                // statusText.text="Join";
+                joinTextTMP.text=joinText;
                 joinTextTMP.gameObject.SetActive(true);
                 exitTextTMP.gameObject.SetActive(false);
 
                 statusBubble.color = joinInfoColor;
             }
             else {
-                // statusText.text="Exit";
+                exitTextTMP.text=exitText;
                 joinTextTMP.gameObject.SetActive(false);
                 exitTextTMP.gameObject.SetActive(true);
 
@@ -101,52 +125,10 @@ namespace com.rurinya.joinnotification
         //         }
         //     }
         // }
-        private void Starter(int mode)
-        {
-            
-            if (firstAction)
-            {
-                if (background!= null && statusBubble != null && joinTextTMP != null && exitTextTMP != null && usernameTMP != null)
-                    animatedComponents = new Component[] {background, statusBubble, joinTextTMP, exitTextTMP,  usernameTMP};
-                else
-                {
-                    Debug.LogError("RJoinNotification: アニメーションで使用されるコンポーネントが初期化されていません。");
-                    gameObject.SetActive(false);
-                    return;
-                }
-                
-                defaultUsernamePosition = (int)usernameTMP.gameObject.GetComponent<RectTransform>().anchoredPosition.x - popModeOffset;
-                defaultBGPosition = (int)background.gameObject.GetComponent<RectTransform>().anchoredPosition.x - popModeOffset;
-                defaultStatusPosition = Math.Abs((int)statusBubble.gameObject.GetComponent<RectTransform>().anchoredPosition.x) + popModeOffset;
-
-                
-                defaultScale = background.transform.localScale;
-                canvasAnimationSystem
-                    .DefineTransform(animatedComponents, new Vector3(1,1,1), TransformType.Scale)
-                    .SaveTransform(animatedComponents, new TransformType[]{TransformType.Position})
-                    .Hide(background)
-                    .Hide(statusBubble)
-                    .Hide(joinTextTMP)
-                    .Hide(exitTextTMP)
-                    .Hide(usernameTMP);
-                firstAction = false;
-            }
-            
-            if (mode != 1)
-            canvasAnimationSystem
-                .Cancel(animatedComponents)
-                .SaveTransform(animatedComponents, new TransformType[]{TransformType.Position});
-                // .Hide(background)
-                // .Hide(statusBubble)
-                // .Hide(statusText)
-                // .Hide(usernameText);
-            else
-            canvasAnimationSystem
-                .Cancel(animatedComponents);
-        }
         private void AnimationController(int mode)
         {
-            Starter(mode);
+            canvasAnimationSystem
+                .Cancel(animatedComponents);
             // Not In Use
             // if(allowTextAnimation)
             // {
