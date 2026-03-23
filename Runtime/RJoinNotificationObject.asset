@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: RJoinNotificationObject
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: 7034f04f1ce1bb4459c9fef07b9d3e06, type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 416f7463e2732ee439f22cc3ff3e4ad7, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 60b782cfc70bf97499abbd1f7839bf5e, type: 3}
