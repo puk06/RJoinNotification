@@ -454,8 +454,8 @@ MonoBehaviour:
   background: {fileID: 4568135123074455526}
   statusBubble: {fileID: 8258067470798106875}
   joinText: {fileID: 6018560138181725197}
-  exitText: {fileID: 0}
-  usernameText: {fileID: 1030623592140357696}
+  exitText: {fileID: 1030623592140357696}
+  usernameText: {fileID: 7859915591978859929}
   canvasAnimationSystem: {fileID: 0}
 --- !u!114 &7078300591508023818
 MonoBehaviour:
